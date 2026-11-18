@@ -1,26 +1,189 @@
 @import "tailwindcss";
 
+@theme {
+  --color-spin-bg: #141413;
+  --color-spin-ambient: #1E1E1C;
+  --color-spin-text: #EAEAE6;
+  --color-spin-muted: #7A7A75;
+  --color-spin-ticker: #9A9A94;
+  --color-spin-orange: #FF5E00;
+  --color-spin-crimson: #C81E1E;
+  --color-spin-cream: #D6D2C4;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #141413;
+  --foreground: #EAEAE6;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #141413;
+  color: #EAEAE6;
+}
+
+/* Studio Ambient Radial Lighting matching editorial showcase */
+.studio-backdrop {
+  background: radial-gradient(
+    circle at 50% 48%,
+    #22221F 0%,
+    #181816 42%,
+    #141413 78%,
+    #10100F 100%
+  );
+}
+
+/* Subtle noise grain overlay for editorial garment texture */
+.grain-overlay {
+  background-image: radial-gradient(rgba(234, 234, 230, 0.035) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Infinite Ticker Marquee */
+@keyframes tickerScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: tickerScroll 32s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* 3D Orbital Stage & Elliptical Floor Ring */
+.orbit-stage {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+}
+
+.orbital-floor-ring {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  width: min(82vw, 1080px);
+  height: min(24vw, 290px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(234, 234, 230, 0.14);
+  box-shadow:
+    0 0 60px rgba(234, 234, 230, 0.03),
+    inset 0 0 40px rgba(234, 234, 230, 0.02);
+  pointer-events: none;
+}
+
+.orbital-floor-ring-inner {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  width: min(56vw, 720px);
+  height: min(15vw, 185px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed rgba(234, 234, 230, 0.07);
+  pointer-events: none;
+}
+
+/* Subtle glossy studio floor reflection below center piece */
+.floor-reflection {
+  position: absolute;
+  left: 50%;
+  top: 69%;
+  width: min(44vw, 520px);
+  height: 110px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(26px);
+  opacity: 0.24;
+  pointer-events: none;
+  transition: background-color 0.5s ease;
+}
+
+/* Garment Card in 3D Sphere Orbit */
+.garment-node {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: clamp(230px, 23vw, 340px);
+  height: clamp(260px, 27vw, 390px);
+  margin-left: calc(clamp(230px, 23vw, 340px) / -2);
+  margin-top: calc(clamp(260px, 27vw, 390px) / -2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity, filter;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.garment-visual-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.garment-node.is-front:hover .garment-visual-wrap {
+  transform: translateY(-10px) scale(1.045);
+}
+
+.garment-node:not(.is-front):hover .garment-visual-wrap {
+  transform: translateY(-6px) scale(1.03);
+}
+
+/* Realistic Studio Apparel Drop Shadow */
+.garment-shadow {
+  filter: drop-shadow(0 28px 34px rgba(0, 0, 0, 0.78))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.55));
+}
+
+/* Reflected silhouette beneath active garment */
+.garment-reflection {
+  position: absolute;
+  bottom: -36%;
+  left: 10%;
+  width: 80%;
+  height: 45%;
+  transform: scaleY(-0.55);
+  opacity: 0.14;
+  filter: blur(8px);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 75%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 75%);
+  pointer-events: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #141413;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2E2B;
+  border-radius: 9999px;
 }
