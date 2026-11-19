@@ -29,7 +29,7 @@ export const OrbitHUD: React.FC<OrbitHUDProps> = ({ onProgressClick, progressRat
       {/* Title */}
       <h1
         onClick={() => openModal('product')}
-        className="font-molgan text-xl sm:text-2xl tracking-tight text-[#EAEAE6] leading-snug cursor-pointer hover:opacity-75 transition-opacity px-4"
+        className="font-molgan text-xl sm:text-2xl tracking-wider text-[#EAEAE6] leading-snug cursor-pointer hover:opacity-75 transition-opacity px-4"
       >
         {activeGarment.name}
       </h1>

@@ -4,7 +4,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-pf-01',
     sku: 'SPN-26-PF01',
-    name: 'Safety Orange Puffer Jacket',
+    name: 'Orange Puffer',
     price: 5999,
     color: '#FF5E00',
     fabric: 'Japanese Micro-Ripstop High-Puff Down',
@@ -16,7 +16,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-sp-01',
     sku: 'SPN-26-SP01',
-    name: 'Baggy Cargo Sweatpants',
+    name: 'Cargo Sweatpants',
     price: 3299,
     color: '#9A9A94',
     fabric: '480 GSM Custom Fleece Terry',
@@ -28,7 +28,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-sp-02',
     sku: 'SPN-26-SP02',
-    name: 'Y2K Slouch Cargo Sweatpants',
+    name: 'Slouch Cargos',
     price: 3199,
     color: '#D6D2C4',
     fabric: '460 GSM Heavyweight Brushed Cotton',
@@ -40,7 +40,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-pf-02',
     sku: 'SPN-26-PF02',
-    name: 'Matte Black Technical Puffer',
+    name: 'Black Puffer',
     price: 6999,
     color: '#2E2E2B',
     fabric: 'Weatherproof Matte Technical Membrane',
@@ -52,7 +52,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-fl-01',
     sku: 'SPN-26-FL01',
-    name: 'Buffalo Check Flannel Overshirt',
+    name: 'Buffalo Flannel',
     price: 3299,
     color: '#C81E1E',
     fabric: '460 GSM Heavyweight Brushed Buffalo Flannel',
@@ -64,7 +64,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-vt-01',
     sku: 'SPN-26-VT01',
-    name: 'Modular Tactical Hardware Rig',
+    name: 'Tactical Rig',
     price: 2799,
     color: '#FF5E00',
     fabric: 'Ballistic Cordura 500D & CNC Alloy Buckles',
@@ -76,7 +76,7 @@ export const INITIAL_GARMENTS: Garment[] = [
   {
     id: 'spn-sf-01',
     sku: 'SPN-26-SF01',
-    name: 'Charcoal French Terry Crewneck',
+    name: 'Charcoal Crewneck',
     price: 2899,
     color: '#2E2E2B',
     fabric: '520 GSM Brushed Loopback Heavyweight Fleece',
