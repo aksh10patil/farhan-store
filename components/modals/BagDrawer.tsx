@@ -38,7 +38,7 @@ export const BagDrawer: React.FC = () => {
           <div className="mt-5 space-y-4 max-h-[60vh] overflow-y-auto pr-1">
             {bag.length === 0 ? (
               <p className="font-mono text-xs text-[#7A7A75] py-12 text-center">
-                YOUR SPIN® BAG IS EMPTY.
+                YOUR ZAID® BAG IS EMPTY.
               </p>
             ) : (
               bag.map((item) => (

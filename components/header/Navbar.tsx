@@ -40,7 +40,7 @@ export const Navbar: React.FC = () => {
             Lookbook
           </button>
           <button
-            onClick={() => showToast('SPIN® TECHNICAL ARCHIVE 2026')}
+            onClick={() => showToast('ZAID® TECHNICAL ARCHIVE 2026')}
             className="hover:text-[#EAEAE6] transition-colors cursor-pointer"
           >
             Archive
@@ -48,15 +48,15 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Center: SPIN® Geometric Italicized Wordmark */}
+      {/* Center: ZAID® Geometric Italicized Wordmark */}
       <button
         type="button"
         onClick={() => snapToIndex(0)}
         className="absolute left-1/2 -translate-x-1/2 flex items-start select-none group cursor-pointer bg-transparent border-0"
-        aria-label="SPIN Home - Reset Orbit"
+        aria-label="ZAID Home - Reset Orbit"
       >
         <span className="font-black italic tracking-[-0.05em] text-[25px] md:text-[28px] leading-none text-[#EAEAE6] group-hover:opacity-90 transition-opacity">
-          SPIN
+          ZAID
         </span>
         <span className="text-[10px] font-bold text-[#EAEAE6] ml-0.5 mt-0.5">®</span>
       </button>

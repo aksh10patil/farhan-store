@@ -13,7 +13,7 @@ export interface Garment {
   id: string;
   sku: string;
   name: string;
-  tag: string;
+  tag?: string;
   price: number;
   color: string;
   fabric: string;

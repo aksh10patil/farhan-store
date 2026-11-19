@@ -28,9 +28,11 @@ export const OrbitHUD: React.FC<OrbitHUDProps> = ({ onProgressClick, progressRat
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col items-center text-center z-20 pb-1">
       {/* Active Garment Meta Tag */}
-      <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#7A7A75] mb-1.5 transition-all duration-300">
-        {activeGarment.tag}
-      </div>
+      {activeGarment.tag && (
+        <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#7A7A75] mb-1.5 transition-all duration-300">
+          {activeGarment.tag}
+        </div>
+      )}
 
       {/* Active Garment Title */}
       <div className="overflow-hidden py-0.5">
@@ -94,10 +96,6 @@ export const OrbitHUD: React.FC<OrbitHUDProps> = ({ onProgressClick, progressRat
         </button>
       </div>
 
-      {/* Subtle Desktop Interaction Hint */}
-      <p className="mt-4 font-mono text-[10px] tracking-[0.18em] uppercase text-[#666661]">
-        Scroll or Drag to Orbit &nbsp;•&nbsp; Click Front Piece to Inspect
-      </p>
     </div>
   );
 };

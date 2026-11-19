@@ -236,7 +236,7 @@ export const GarmentIllustration: React.FC<GarmentIllustrationProps> = ({
           <rect x="172" y="72" width="16" height="264" fill="#39402D" stroke="#22261B" strokeWidth={1.5} />
           <line x1="112" y1="155" x2="154" y2="175" stroke="#1A1D15" strokeWidth={3} strokeLinecap="round" />
           <line x1="248" y1="155" x2="206" y2="175" stroke="#1A1D15" strokeWidth={3} strokeLinecap="round" />
-          {/* SPIN® Technical Patch */}
+          {/* ZAID® Technical Patch */}
           <rect x="115" y="118" width="34" height="14" rx="2" fill="#141413" />
           <text
             x="132"
@@ -246,7 +246,7 @@ export const GarmentIllustration: React.FC<GarmentIllustrationProps> = ({
             fontFamily="monospace"
             textAnchor="middle"
           >
-            SPIN®
+            ZAID®
           </text>
         </svg>
       );

@@ -65,7 +65,7 @@ export const ProductDetailModal: React.FC = () => {
           </div>
 
           <span className="absolute bottom-4 left-5 font-mono text-[10px] tracking-[0.16em] uppercase text-[#7A7A75]">
-            SPIN® STUDIO ARCHIVE // 360° SPEC
+            ZAID® STUDIO ARCHIVE // 360° SPEC
           </span>
         </div>
 

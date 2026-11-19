@@ -27,7 +27,7 @@ export const AddGarmentModal: React.FC = () => {
         color,
         fabric: 'Technical Composite Shell',
         fit: 'Relaxed Studio Fit',
-        desc: 'Custom added piece integrated directly into the SPIN® Trail Season 3D orbital showcase.',
+        desc: 'Custom added piece integrated directly into the ZAID® Trail Season 3D orbital showcase.',
         svgType: 'shell',
         imageUrl: finalUrl,
       });
