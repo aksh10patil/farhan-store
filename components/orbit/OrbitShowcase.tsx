@@ -9,6 +9,7 @@ import { OrbitHUD } from './OrbitHUD';
 // Orbital geometry constants — keeps garments locked to the tilted floor plane
 const ORBIT_TILT_DEG = 13.5;
 const ORBIT_TILT_RAD = (ORBIT_TILT_DEG * Math.PI) / 180;
+const INITIAL_REVOLUTIONS = 0.375; // Shorter by 50% (~135° sweep down from 270°)
 
 export const OrbitShowcase: React.FC = () => {
   const {
@@ -23,29 +24,38 @@ export const OrbitShowcase: React.FC = () => {
   } = useStore();
 
   const stageRef = useRef<HTMLElement>(null);
+  const floorRingRef = useRef<HTMLDivElement>(null);
   const nodesRef = useRef<(HTMLDivElement | null)[]>([]);
   const innerVisualsRef = useRef<(HTMLDivElement | null)[]>([]);
   const currentIndexRef = useRef(currentIndex);
+  const activeModalRef = useRef(activeModal);
+  const hasPlayedIntro = useRef(false);
 
   // Unified animation state driven by GSAP
   const orbitState = useRef({
-    rotation: -0.65,       // Subtle initial offset for graceful settle
-    entranceProgress: 0,   // 0 -> 1 staggered bloom on initial load
-    radiusScale: 0.88,     // Subtle orbital expansion on load
+    rotation: 0,
+    entranceProgress: 0, // 0 -> 1 staggered bloom on initial load
+    radiusScale: 0.84,   // Subtle orbital expansion on load
   });
 
   // Physics & pointer tracking
   const velocityRef = useRef(0);
   const isPointerDown = useRef(false);
   const hasDragged = useRef(false);
+  const startPointerPos = useRef({ x: 0, y: 0 });
   const lastPointerX = useRef(0);
   const lastPointerTime = useRef(0);
   const snapTimeout = useRef<NodeJS.Timeout | null>(null);
   const inertiaTween = useRef<gsap.core.Tween | null>(null);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     currentIndexRef.current = currentIndex;
   }, [currentIndex]);
+
+  useEffect(() => {
+    activeModalRef.current = activeModal;
+  }, [activeModal]);
 
   useEffect(() => {
     nodesRef.current = nodesRef.current.slice(0, garments.length);
@@ -69,15 +79,27 @@ export const OrbitShowcase: React.FC = () => {
 
     const stageWidth = window.innerWidth;
     const stageHeight = window.innerHeight;
+    const isMobile = stageWidth < 768;
 
-    // Responsive radii scaled smoothly on entrance
-    const baseRadiusX = Math.min(stageWidth * 0.35, 480);
-    const baseRadiusZ = Math.min(stageWidth * 0.22, 290);
+    // Responsive radii scaled smoothly on entrance:
+    // On mobile, spread X wider (0.44 of screen) so flank models frame the hero gracefully instead of crowding behind it
+    const baseRadiusX = isMobile
+      ? stageWidth * 0.44
+      : Math.min(stageWidth * 0.35, 480);
+    const baseRadiusZ = isMobile
+      ? Math.min(stageWidth * 0.25, 170)
+      : Math.min(stageWidth * 0.22, 290);
     const radiusX = baseRadiusX * orbitState.current.radiusScale;
     const radiusZ = baseRadiusZ * orbitState.current.radiusScale;
 
+    // Rotate the inner orbital track ring in sync with garment revolution
+    if (floorRingRef.current) {
+      const orbitDeg = -(orbitState.current.rotation / total) * 360;
+      floorRingRef.current.style.transform = `scale(${orbitState.current.radiusScale.toFixed(4)}) rotateZ(${orbitDeg.toFixed(2)}deg)`;
+    }
+
     // Center offset lifts the orbit slightly above optical center for HUD balance
-    const verticalCenterBias = -stageHeight * 0.025;
+    const verticalCenterBias = isMobile ? -stageHeight * 0.016 : -stageHeight * 0.025;
 
     const wrappedIndex = ((Math.round(orbitState.current.rotation) % total) + total) % total;
     if (wrappedIndex !== currentIndexRef.current) {
@@ -110,36 +132,41 @@ export const OrbitShowcase: React.FC = () => {
 
       // Smooth bell curve for the hero foreground piece
       const frontProximity = Math.max(0, Math.cos(theta));
-      const heroCurve = Math.pow(frontProximity, 5);
+      const heroCurve = Math.pow(frontProximity, isMobile ? 4.2 : 5);
 
-      // Staggered entrance per garment (front item blooms first, cascading around)
+      // Staggered entrance bloom across the ring
       const angularDistanceFromFront = Math.abs(diff) / (total / 2);
-      const staggerDelay = angularDistanceFromFront * 0.38;
+      const staggerDelay = angularDistanceFromFront * 0.25;
       const itemEntrance = Math.max(
         0,
         Math.min(1, (masterEntrance - staggerDelay) / (1 - staggerDelay))
       );
-      // Cubic ease-out per item
       const easedEntrance = 1 - Math.pow(1 - itemEntrance, 3);
 
-      // Subtle floating elevation on hero piece + entrance rise
+      // Floating elevation on hero piece + entrance rise
       const y =
         verticalCenterBias +
         planeY -
-        heroCurve * 10 +
-        (1 - easedEntrance) * 28;
+        heroCurve * (isMobile ? 12 : 10) +
+        (1 - easedEntrance) * 24;
 
-      // Perspective scale with graceful entrance bloom
-      const baseScale = 0.54 + normalizedDepth * 0.42 + heroCurve * 0.16;
-      const scale = baseScale * (0.78 + 0.22 * easedEntrance);
+      // Perspective scale: On mobile, amplify hero prominence and push background into deeper perspective
+      const baseScale = isMobile
+        ? 0.48 + normalizedDepth * 0.44 + heroCurve * 0.22
+        : 0.54 + normalizedDepth * 0.42 + heroCurve * 0.16;
+      const scale = baseScale * (0.82 + 0.18 * easedEntrance);
 
       // Subtle inward tilt tangent to the ellipse
-      const rotateY = -Math.sin(theta) * 22;
+      const rotateY = -Math.sin(theta) * (isMobile ? 18 : 22);
       const rotateX = Math.cos(theta) * 3.5;
 
-      // Atmospheric depth falloff
-      const brightness = (0.42 + normalizedDepth * 0.46 + heroCurve * 0.15) * (0.5 + 0.5 * easedEntrance);
-      const baseOpacity = normalizedDepth < 0.12 ? 0.28 : 0.58 + normalizedDepth * 0.42;
+      // Atmospheric depth falloff: On mobile, heighten contrast so the active garment is the undisputed focal star
+      const brightness = isMobile
+        ? (0.34 + normalizedDepth * 0.52 + heroCurve * 0.22) * (0.55 + 0.45 * easedEntrance)
+        : (0.42 + normalizedDepth * 0.46 + heroCurve * 0.15) * (0.55 + 0.45 * easedEntrance);
+      const baseOpacity = isMobile
+        ? (normalizedDepth < 0.18 ? 0.22 : 0.46 + normalizedDepth * 0.54)
+        : (normalizedDepth < 0.12 ? 0.28 : 0.58 + normalizedDepth * 0.42);
       const opacity = baseOpacity * easedEntrance;
       const zIndex = Math.round(normalizedDepth * 100);
 
@@ -148,7 +175,7 @@ export const OrbitShowcase: React.FC = () => {
       node.style.opacity = opacity.toFixed(3);
       node.style.filter = `brightness(${brightness.toFixed(3)})`;
 
-      if (heroCurve > 0.78) {
+      if (heroCurve > (isMobile ? 0.74 : 0.78)) {
         node.classList.add('is-front');
       } else {
         node.classList.remove('is-front');
@@ -164,12 +191,9 @@ export const OrbitShowcase: React.FC = () => {
       if (snapTimeout.current) clearTimeout(snapTimeout.current);
       if (inertiaTween.current) inertiaTween.current.kill();
 
-      // Project forward slightly based on release velocity for natural momentum
       const projectedRotation = orbitState.current.rotation + initialVelocity * 0.22;
       const targetSlot = Math.round(projectedRotation);
       const distance = Math.abs(targetSlot - orbitState.current.rotation);
-
-      // Adaptive duration: short snaps feel crisp, longer coasts feel fluid
       const duration = Math.min(1.05, Math.max(0.52, 0.48 + distance * 0.22));
 
       inertiaTween.current = gsap.to(orbitState.current, {
@@ -188,6 +212,7 @@ export const OrbitShowcase: React.FC = () => {
     const total = garments.length;
     if (!total) return;
 
+    if (introTimelineRef.current) introTimelineRef.current.kill();
     if (snapTimeout.current) clearTimeout(snapTimeout.current);
     if (inertiaTween.current) inertiaTween.current.kill();
 
@@ -206,19 +231,85 @@ export const OrbitShowcase: React.FC = () => {
     });
   }, [targetIndex, garments.length, renderOrbitFrame]);
 
-  // Setup wheel, pointer, resize listeners & slow cinematic entrance
+  // Sweeping initial revolution (Strict-Mode safe)
+  useEffect(() => {
+    if (garments.length === 0) return;
+
+    if (hasPlayedIntro.current) {
+      orbitState.current.entranceProgress = 1;
+      orbitState.current.radiusScale = 1;
+      renderOrbitFrame();
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      orbitState.current.rotation = -garments.length * INITIAL_REVOLUTIONS;
+      orbitState.current.entranceProgress = 0;
+      orbitState.current.radiusScale = 0.84;
+      renderOrbitFrame();
+
+      const tl = gsap.timeline({
+        delay: 0.1,
+        onComplete: () => {
+          hasPlayedIntro.current = true;
+        },
+      });
+      introTimelineRef.current = tl;
+
+      tl.to(
+        orbitState.current,
+        {
+          entranceProgress: 1,
+          duration: 1.8,
+          ease: 'power2.out',
+          onUpdate: renderOrbitFrame,
+        },
+        0
+      ).to(
+        orbitState.current,
+        {
+          radiusScale: 1,
+          rotation: 0,
+          duration: 3.5,
+          ease: 'power3.out',
+          onUpdate: renderOrbitFrame,
+        },
+        0
+      );
+    }, stageRef);
+
+    return () => {
+      ctx.revert();
+    };
+  }, [garments.length, renderOrbitFrame]);
+
+  // Setup wheel, pointer, and resize listeners
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
+    const cancelIntro = () => {
+      if (introTimelineRef.current && introTimelineRef.current.isActive()) {
+        introTimelineRef.current.kill();
+        hasPlayedIntro.current = true;
+        gsap.to(orbitState.current, {
+          entranceProgress: 1,
+          radiusScale: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+          onUpdate: renderOrbitFrame,
+        });
+      }
+    };
+
     const handleWheel = (e: WheelEvent) => {
-      if (activeModal !== null) return;
+      if (activeModalRef.current !== null) return;
       e.preventDefault();
 
+      cancelIntro();
       if (inertiaTween.current) inertiaTween.current.kill();
       if (snapTimeout.current) clearTimeout(snapTimeout.current);
 
-      // Support both vertical wheel and horizontal trackpad swipes
       const rawDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       const step = rawDelta * -0.0021;
       orbitState.current.rotation += step;
@@ -232,31 +323,37 @@ export const OrbitShowcase: React.FC = () => {
     };
 
     const handlePointerDown = (e: PointerEvent) => {
-      if (activeModal !== null) return;
+      if (activeModalRef.current !== null) return;
       isPointerDown.current = true;
       hasDragged.current = false;
+      startPointerPos.current = { x: e.clientX, y: e.clientY };
       lastPointerX.current = e.clientX;
       lastPointerTime.current = performance.now();
       velocityRef.current = 0;
 
+      cancelIntro();
       if (inertiaTween.current) inertiaTween.current.kill();
       if (snapTimeout.current) clearTimeout(snapTimeout.current);
     };
 
     const handlePointerMove = (e: PointerEvent) => {
-      if (!isPointerDown.current || activeModal !== null) return;
+      if (!isPointerDown.current || activeModalRef.current !== null) return;
       const now = performance.now();
       const deltaX = e.clientX - lastPointerX.current;
       const dt = Math.max(8, now - lastPointerTime.current);
 
-      if (Math.abs(deltaX) > 3) {
+      const dist = Math.hypot(
+        e.clientX - startPointerPos.current.x,
+        e.clientY - startPointerPos.current.y
+      );
+      if (dist > 7) {
         hasDragged.current = true;
       }
 
-      const step = deltaX * 0.0042;
+      const isMobile = window.innerWidth < 768;
+      const step = deltaX * (isMobile ? 0.0050 : 0.0042);
       orbitState.current.rotation -= step;
 
-      // Exponential moving average for smooth release velocity
       const instantVelocity = (-step / dt) * 16.67;
       velocityRef.current = velocityRef.current * 0.65 + instantVelocity * 0.35;
 
@@ -282,37 +379,7 @@ export const OrbitShowcase: React.FC = () => {
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('resize', handleResize);
 
-    // Initial render at progress = 0 (hidden/contracted)
-    renderOrbitFrame();
-
-    // Slow, ceremonial entrance choreography on page load
-    const introTimeline = gsap.timeline({ delay: 0.12 });
-
-    introTimeline
-      .to(
-        orbitState.current,
-        {
-          entranceProgress: 1,
-          duration: 1.85,
-          ease: 'power2.out',
-          onUpdate: renderOrbitFrame,
-        },
-        0
-      )
-      .to(
-        orbitState.current,
-        {
-          radiusScale: 1,
-          rotation: 0,
-          duration: 2.1,
-          ease: 'expo.out',
-          onUpdate: renderOrbitFrame,
-        },
-        0.08
-      );
-
     return () => {
-      introTimeline.kill();
       if (inertiaTween.current) inertiaTween.current.kill();
       stage.removeEventListener('wheel', handleWheel);
       stage.removeEventListener('pointerdown', handlePointerDown);
@@ -321,7 +388,7 @@ export const OrbitShowcase: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       if (snapTimeout.current) clearTimeout(snapTimeout.current);
     };
-  }, [activeModal, renderOrbitFrame, scheduleWeightedSettle]);
+  }, [renderOrbitFrame, scheduleWeightedSettle]);
 
   // Click on progress scrub track
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -331,26 +398,17 @@ export const OrbitShowcase: React.FC = () => {
     snapToIndex(target);
   };
 
-  // Normalized scrub bar offset derived cleanly from current index
   const normalizedProgress =
     garments.length > 1 ? (currentIndex / (garments.length - 1)) * 110 : 0;
 
   return (
     <main
       ref={stageRef}
-      className="relative w-full h-screen flex flex-col justify-between pt-24 pb-8 px-6 z-10 overflow-hidden select-none cursor-grab active:cursor-grabbing"
+      className="relative w-full h-[100dvh] flex flex-col justify-between pt-20 sm:pt-24 pb-6 sm:pb-8 px-4 sm:px-6 z-10 overflow-hidden select-none cursor-grab active:cursor-grabbing touch-none"
     >
-      {/* Top Collection Subtitle */}
-      <div className="w-full text-center pt-2 z-20 pointer-events-none">
-        <p className="font-mono text-[11px] md:text-[12px] tracking-[0.26em] uppercase text-[#8A8A84]">
-          TRAIL SEASON
-        </p>
-      </div>
-
       {/* 3D Orbital Sphere Container */}
       <div
         className="orbit-stage relative flex-1 w-full max-w-[1440px] mx-auto my-auto flex items-center justify-center"
-        style={{ perspective: '1350px' }}
       >
         {/* Tilted Elliptical Orbital Floor Plane (matches ORBIT_TILT_DEG = 13.5deg) */}
         <div
@@ -361,9 +419,12 @@ export const OrbitShowcase: React.FC = () => {
           }}
         >
           {/* Outer Orbital Track Ring */}
-          <div className="w-[min(74vw,980px)] h-[min(74vw,980px)] rounded-full border border-[#EAEAE6]/[0.09] shadow-[0_0_60px_rgba(255,255,255,0.02)_inset]" />
-          {/* Inner Precision Hairline Ring */}
-          <div className="absolute w-[min(60vw,790px)] h-[min(60vw,790px)] rounded-full border border-dashed border-[#EAEAE6]/[0.06]" />
+          <div className="w-[min(88vw,980px)] md:w-[min(74vw,980px)] h-[min(88vw,980px)] md:h-[min(74vw,980px)] rounded-full border border-[#EAEAE6]/[0.09] shadow-[0_0_60px_rgba(255,255,255,0.02)_inset]" />
+          {/* Inner Precision Hairline Ring (rotates with the orbit) */}
+          <div
+            ref={floorRingRef}
+            className="absolute w-[min(72vw,790px)] md:w-[min(60vw,790px)] h-[min(72vw,790px)] md:h-[min(60vw,790px)] rounded-full border border-dashed border-[#EAEAE6]/[0.08] will-change-transform"
+          />
         </div>
 
         {/* Ambient Color Floor Reflection */}
@@ -387,7 +448,6 @@ export const OrbitShowcase: React.FC = () => {
                 ref={(el) => setNodeRef(el, idx)}
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Ignore click if user was dragging the orbit
                   if (hasDragged.current) return;
                   if (isFront) {
                     openModal('product');
@@ -395,14 +455,15 @@ export const OrbitShowcase: React.FC = () => {
                     snapToIndex(idx);
                   }
                 }}
-                className={`garment-node absolute will-change-transform transition-[filter] duration-300 ${isFront ? 'is-front cursor-pointer' : 'cursor-pointer'
-                  }`}
+                className={`garment-node absolute will-change-transform transition-[filter] duration-300 ${
+                  isFront ? 'is-front cursor-pointer' : 'cursor-pointer'
+                }`}
                 data-index={idx}
                 title={`${item.name} — Click to inspect`}
               >
                 <div
                   ref={(el) => setInnerVisualRef(el, idx)}
-                  className="garment-visual-wrap garment-shadow transition-transform duration-500 ease-out hover:scale-[1.03]"
+                  className="garment-visual-wrap garment-shadow transition-transform duration-600 ease-out hover:scale-[1.0]"
                 >
                   {item.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -441,8 +502,6 @@ export const OrbitShowcase: React.FC = () => {
             );
           })}
         </div>
-
-
       </div>
 
       {/* Bottom HUD & Controls */}

@@ -8,7 +8,7 @@ export const AddGarmentModal: React.FC = () => {
   const { activeModal, closeModal, addCustomGarment } = useStore();
 
   const [name, setName] = useState('');
-  const [price, setPrice] = useState(220);
+  const [price, setPrice] = useState(2999);
   const [color, setColor] = useState('#FF5E00');
   const [imgUrl, setImgUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -23,7 +23,7 @@ export const AddGarmentModal: React.FC = () => {
       addCustomGarment({
         name: name.trim(),
         tag: 'CUSTOM DROP // TRAIL SEASON ARCHIVE',
-        price: Number(price) || 200,
+        price: Number(price) || 2999,
         color,
         fabric: 'Technical Composite Shell',
         fit: 'Relaxed Studio Fit',
@@ -106,13 +106,13 @@ export const AddGarmentModal: React.FC = () => {
                 htmlFor="customPrice"
                 className="block font-mono text-[10px] uppercase tracking-[0.14em] text-[#9A9A94] mb-1.5"
               >
-                Price (USD)
+                Price (INR)
               </label>
               <input
                 id="customPrice"
                 type="number"
                 required
-                min={10}
+                min={100}
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#141413] border border-[#EAEAE6]/15 text-sm text-[#EAEAE6] focus:outline-none focus:border-[#EAEAE6]/50"

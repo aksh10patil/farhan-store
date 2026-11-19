@@ -49,7 +49,7 @@ export const BagDrawer: React.FC = () => {
                   <div>
                     <p className="text-sm font-semibold text-[#EAEAE6]">{item.name}</p>
                     <p className="font-mono text-[10px] text-[#8A8A84] mt-0.5">
-                      SIZE: {item.size} &nbsp;//&nbsp; ${item.price} USD
+                      SIZE: {item.size} &nbsp;//&nbsp; ₹{item.price.toLocaleString('en-IN')}
                     </p>
                   </div>
                   <button
@@ -68,7 +68,7 @@ export const BagDrawer: React.FC = () => {
         <div className="pt-4 border-t border-[#EAEAE6]/10">
           <div className="flex items-center justify-between font-mono text-xs mb-4">
             <span className="text-[#9A9A94]">SUBTOTAL</span>
-            <span className="text-[#EAEAE6] font-bold">${bagSubtotal} USD</span>
+            <span className="text-[#EAEAE6] font-bold">₹{bagSubtotal.toLocaleString('en-IN')}</span>
           </div>
           <button
             type="button"

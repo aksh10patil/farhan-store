@@ -83,13 +83,13 @@ export const ProductDetailModal: React.FC = () => {
 
             <h2
               id="product-modal-title"
-              className="text-2xl sm:text-3xl font-bold tracking-tight text-[#EAEAE6]"
+              className="font-molgan text-2xl sm:text-3xl tracking-wide text-[#EAEAE6]"
             >
               {activeGarment.name}
             </h2>
 
             <p className="font-mono text-lg text-[#EAEAE6]/90 mt-2">
-              ${activeGarment.price} USD
+              ₹{activeGarment.price.toLocaleString('en-IN')}
             </p>
 
             <p className="text-sm text-[#9A9A94] leading-relaxed mt-4">
@@ -147,7 +147,7 @@ export const ProductDetailModal: React.FC = () => {
               onClick={() => addToBag(activeGarment, selectedSize)}
               className="flex-1 py-3.5 px-6 rounded-full bg-[#EAEAE6] hover:bg-white text-[#141413] font-bold text-xs font-mono tracking-[0.16em] uppercase transition-all active:scale-[0.99] shadow-lg cursor-pointer"
             >
-              Add to Bag — ${activeGarment.price}
+              Add to Bag — ₹{activeGarment.price.toLocaleString('en-IN')}
             </button>
           </div>
         </div>

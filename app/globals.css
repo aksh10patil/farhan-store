@@ -12,6 +12,7 @@
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
   --font-brigold: var(--font-brigold), 'Brigold', sans-serif;
+  --font-molgan: var(--font-molgan), 'Molgan', serif;
 }
 
 @font-face {
@@ -20,8 +21,18 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Molgan';
+  src: url('/fonts/molgan.otf') format('opentype');
+  font-display: swap;
+}
+
 .font-brigold {
   font-family: var(--font-brigold), 'Brigold', sans-serif;
+}
+
+.font-molgan {
+  font-family: var(--font-molgan), 'Molgan', serif;
 }
 
 :root {
@@ -62,7 +73,7 @@ body {
 }
 
 /* Infinite Ticker Marquee */
-@keyframes tickerScroll {
+@keyframes ticker-scroll {
   0% {
     transform: translate3d(0, 0, 0);
   }
@@ -73,9 +84,8 @@ body {
 }
 
 .ticker-track {
-  display: flex;
-  width: max-content;
-  animation: tickerScroll 32s linear infinite;
+  animation: ticker-scroll 28s linear infinite;
+  will-change: transform;
 }
 
 .ticker-track:hover {
@@ -84,8 +94,14 @@ body {
 
 /* 3D Orbital Stage & Elliptical Floor Ring */
 .orbit-stage {
-  perspective: 1600px;
+  perspective: 1050px;
   transform-style: preserve-3d;
+}
+
+@media (min-width: 768px) {
+  .orbit-stage {
+    perspective: 1350px;
+  }
 }
 
 .orbital-floor-ring {
@@ -119,32 +135,51 @@ body {
 .floor-reflection {
   position: absolute;
   left: 50%;
-  top: 69%;
-  width: min(44vw, 520px);
-  height: 110px;
+  top: 70%;
+  width: min(68vw, 520px);
+  height: 95px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  filter: blur(26px);
-  opacity: 0.24;
+  filter: blur(28px);
+  opacity: 0.28;
   pointer-events: none;
   transition: background-color 0.5s ease;
+}
+
+@media (min-width: 768px) {
+  .floor-reflection {
+    top: 69%;
+    width: min(44vw, 520px);
+    height: 110px;
+    opacity: 0.24;
+  }
 }
 
 /* Garment Card in 3D Sphere Orbit */
 .garment-node {
   position: absolute;
   left: 50%;
-  top: 47%;
-  width: clamp(230px, 23vw, 340px);
-  height: clamp(260px, 27vw, 390px);
-  margin-left: calc(clamp(230px, 23vw, 340px) / -2);
-  margin-top: calc(clamp(260px, 27vw, 390px) / -2);
+  top: 48%;
+  width: clamp(280px, 74vw, 360px);
+  height: clamp(340px, 48vh, 460px);
+  margin-left: calc(clamp(280px, 74vw, 360px) / -2);
+  margin-top: calc(clamp(340px, 48vh, 460px) / -2);
   display: flex;
   align-items: center;
   justify-content: center;
   will-change: transform, opacity, filter;
   cursor: pointer;
   transform-style: preserve-3d;
+}
+
+@media (min-width: 768px) {
+  .garment-node {
+    top: 47%;
+    width: clamp(230px, 23vw, 340px);
+    height: clamp(260px, 27vw, 390px);
+    margin-left: calc(clamp(230px, 23vw, 340px) / -2);
+    margin-top: calc(clamp(260px, 27vw, 390px) / -2);
+  }
 }
 
 .garment-visual-wrap {

@@ -70,7 +70,7 @@ export const CollectionIndexModal: React.FC = () => {
                 {String(idx + 1).padStart(2, '0')}
               </span>
               <h4 className="text-xs font-semibold text-[#EAEAE6] mt-0.5">{item.name}</h4>
-              <span className="font-mono text-[11px] text-[#9A9A94] mt-1">${item.price}</span>
+              <span className="font-mono text-[11px] text-[#9A9A94] mt-1">₹{item.price.toLocaleString('en-IN')}</span>
             </div>
           ))}
         </div>

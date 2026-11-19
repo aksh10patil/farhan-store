@@ -19,6 +19,12 @@ const brigold = localFont({
   display: 'swap',
 });
 
+const molgan = localFont({
+  src: './fonts/molgan.otf',
+  variable: '--font-molgan',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'ZAID® — TRAIL SEASON',
   description: 'Trail Season Drop 01 — Engineered Outerwear & Layering',
@@ -32,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${brigold.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${brigold.variable} ${molgan.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col studio-backdrop text-[#EAEAE6] selection:bg-[#FF5E00] selection:text-white font-sans">
         {children}
